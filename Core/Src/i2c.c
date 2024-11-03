@@ -21,7 +21,43 @@
 #include "i2c.h"
 
 /* USER CODE BEGIN 0 */
+#define LPS25HB_I2C_ADDRESS 0x5C
+#define HTS221_I2C_ADDRESS  0x5F
 
+// Function to write data to a sensor's register
+uint8_t I2C_Write(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size) {
+    while (LL_I2C_IsActiveFlag_BUSY(I2C1));
+    LL_I2C_HandleTransfer(I2C1, DevAddress, LL_I2C_ADDRSLAVE_7BIT, Size, LL_I2C_MODE_AUTOEND, LL_I2C_GENERATE_START_WRITE);
+    LL_I2C_TransmitData8(I2C1, Reg);
+
+    for (uint16_t i = 0; i < Size; i++) {
+        while (!LL_I2C_IsActiveFlag_TXE(I2C1));
+        LL_I2C_TransmitData8(I2C1, pData[i]);
+    }
+    while (!LL_I2C_IsActiveFlag_STOP(I2C1));
+    LL_I2C_ClearFlag_STOP(I2C1);
+
+    return 0;
+}
+
+// Function to read data from a sensor's register
+uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size) {
+    while (LL_I2C_IsActiveFlag_BUSY(I2C1));
+    LL_I2C_HandleTransfer(I2C1, DevAddress, LL_I2C_ADDRSLAVE_7BIT, 1, LL_I2C_MODE_SOFTEND, LL_I2C_GENERATE_START_WRITE);
+    LL_I2C_TransmitData8(I2C1, Reg);
+
+    while (!LL_I2C_IsActiveFlag_TC(I2C1));
+    LL_I2C_HandleTransfer(I2C1, DevAddress, LL_I2C_ADDRSLAVE_7BIT, Size, LL_I2C_MODE_AUTOEND, LL_I2C_GENERATE_START_READ);
+
+    for (uint16_t i = 0; i < Size; i++) {
+        while (!LL_I2C_IsActiveFlag_RXNE(I2C1));
+        pData[i] = LL_I2C_ReceiveData8(I2C1);
+    }
+    while (!LL_I2C_IsActiveFlag_STOP(I2C1));
+    LL_I2C_ClearFlag_STOP(I2C1);
+
+    return 0;
+}
 /* USER CODE END 0 */
 
 /* I2C1 init function */

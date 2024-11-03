@@ -21,6 +21,8 @@
 #include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
+#include "lps25hb.h"
+#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,7 +69,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+	LPS25HB_Init();
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -105,10 +107,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+	  float pressure, altitude;
+	  char message[100];
+	  LPS25HB_ReadPressure(&pressure);
+	  altitude = LPS25HB_CalculateAltitude(pressure);
+	  sprintf(message, "Pressure: %.2f hPa, Altitude: %.2f m\n", pressure, altitude);
+	  USART2_SendString(message);
+      LL_mDelay(1000); // Delay for 1 second
   }
+  /* USER CODE END WHILE */
+  /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
 
