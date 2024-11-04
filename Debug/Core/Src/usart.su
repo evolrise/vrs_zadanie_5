@@ -7,4 +7,4 @@
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_usart.h:3195:22:LL_USART_DisableIT_CTS	40	static,ignoring_inline_asm
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_usart.h:3527:22:LL_USART_TransmitData8	16	static
 ../Core/Src/usart.c:24:6:USART2_SendString	16	static
-../Core/Src/usart.c:36:6:MX_USART2_UART_Init	64	static
+../Core/Src/usart.c:42:6:MX_USART2_UART_Init	64	static

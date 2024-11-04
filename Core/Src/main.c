@@ -22,6 +22,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "lps25hb.h"
+#include "hts221.h"
 #include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
@@ -67,57 +68,64 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
+	float pressure, altitude, humidity, temperature;
+	char message[150];
+	/* USER CODE BEGIN 1 */
 	LPS25HB_Init();
-  /* USER CODE END 1 */
+	HTS221_Init();
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
+	LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
 
-  /* System interrupt init*/
-  NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+	/* System interrupt init*/
+	NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
-  /* SysTick_IRQn interrupt configuration */
-  NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),15, 0));
+	/* SysTick_IRQn interrupt configuration */
+	NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),15, 0));
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_I2C1_Init();
-  MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_I2C1_Init();
+	MX_USART2_UART_Init();
+	/* USER CODE BEGIN 2 */
 
-  /* USER CODE END 2 */
+	/* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  float pressure, altitude;
-	  char message[100];
-	  LPS25HB_ReadPressure(&pressure);
-	  altitude = LPS25HB_CalculateAltitude(pressure);
-	  sprintf(message, "Pressure: %.2f hPa, Altitude: %.2f m\n", pressure, altitude);
-	  USART2_SendString(message);
-      LL_mDelay(1000); // Delay for 1 second
-  }
-  /* USER CODE END WHILE */
-  /* USER CODE BEGIN 3 */
-  /* USER CODE END 3 */
+	/* Infinite loop */
+
+	while (1)
+	{
+		/* USER CODE BEGIN WHILE */
+		LPS25HB_ReadPressure(&pressure);
+		altitude = LPS25HB_CalculateAltitude(pressure);
+
+		humidity = HTS221_ReadHumidity();
+		temperature = HTS221_ReadTemperature();
+		sprintf(message, "Pressure: %.2f hPa, Altitude: %.2f m, Humidity: %.2f %%, Temperature: %.2f °C\n",
+				pressure, altitude, humidity, temperature);
+		USART2_SendString(message);
+
+		LL_mDelay(1000);
+		/* USER CODE END WHILE */
+	}
+
+	/* USER CODE BEGIN 3 */
+	/* USER CODE END 3 */
 }
 
 /**

@@ -21,8 +21,14 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-void USART2_SendString(char *str) {
-    while (*str) {
+void USART2_SendString(char *str)
+{
+	if (!str)
+	{
+		return;
+	}
+    while (*str)
+    {
         while (!LL_USART_IsActiveFlag_TXE(USART2));
         LL_USART_TransmitData8(USART2, *str++);
     }
