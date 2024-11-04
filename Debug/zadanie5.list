@@ -7,19 +7,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         00006584  08000190  08000190  00001190  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000408  08006718  08006718  00007718  2**3
+  2 .rodata       00000410  08006718  08006718  00007718  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08006b20  08006b20  000081e0  2**0
+  3 .ARM.extab    00000000  08006b28  08006b28  000081e0  2**0
                   CONTENTS
-  4 .ARM          00000008  08006b20  08006b20  00007b20  2**2
+  4 .ARM          00000008  08006b28  08006b28  00007b28  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  08006b28  08006b28  000081e0  2**0
+  5 .preinit_array 00000000  08006b30  08006b30  000081e0  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08006b28  08006b28  00007b28  2**2
+  6 .init_array   00000004  08006b30  08006b30  00007b30  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  08006b2c  08006b2c  00007b2c  2**2
+  7 .fini_array   00000004  08006b34  08006b34  00007b34  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         000001e0  20000000  08006b30  00008000  2**3
+  8 .data         000001e0  20000000  08006b38  00008000  2**3
                   CONTENTS, ALLOC, LOAD, DATA
   9 .ccmram       00000000  10000000  10000000  000081e0  2**0
                   CONTENTS
@@ -1821,7 +1821,6 @@ uint8_t I2C_Write(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Siz
 
 08001104 <I2C_Read>:
 
-// Function to read data from a sensor's register
 uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size)
 {
  8001104:	b590      	push	{r4, r7, lr}
@@ -1839,10 +1838,10 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
  800111a:	f242 7310 	movw	r3, #10000	@ 0x2710
  800111e:	617b      	str	r3, [r7, #20]
 
-    while (LL_I2C_IsActiveFlag_BUSY(I2C1))
+    while (LL_I2C_IsActiveFlag_BUSY(I2C1)) // checking if bus is busy
  8001120:	e006      	b.n	8001130 <I2C_Read+0x2c>
     {
-        if ((timeout--) == 0) return 1; // Timeout
+        if ((timeout--) == 0) return 1;
  8001122:	697b      	ldr	r3, [r7, #20]
  8001124:	1e5a      	subs	r2, r3, #1
  8001126:	617a      	str	r2, [r7, #20]
@@ -1850,7 +1849,7 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
  800112a:	d101      	bne.n	8001130 <I2C_Read+0x2c>
  800112c:	2301      	movs	r3, #1
  800112e:	e068      	b.n	8001202 <I2C_Read+0xfe>
-    while (LL_I2C_IsActiveFlag_BUSY(I2C1))
+    while (LL_I2C_IsActiveFlag_BUSY(I2C1)) // checking if bus is busy
  8001130:	4836      	ldr	r0, [pc, #216]	@ (800120c <I2C_Read+0x108>)
  8001132:	f7ff feca 	bl	8000eca <LL_I2C_IsActiveFlag_BUSY>
  8001136:	4603      	mov	r3, r0
@@ -1877,10 +1876,10 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
     timeout = I2C_TIMEOUT;
  800115a:	f242 7310 	movw	r3, #10000	@ 0x2710
  800115e:	617b      	str	r3, [r7, #20]
-    while (!LL_I2C_IsActiveFlag_TC(I2C1))
+    while (!LL_I2C_IsActiveFlag_TC(I2C1)) // waiting till transfer complete (TC)
  8001160:	e006      	b.n	8001170 <I2C_Read+0x6c>
     {
-        if ((timeout--) == 0) return 2; // Timeout
+        if ((timeout--) == 0) return 2;
  8001162:	697b      	ldr	r3, [r7, #20]
  8001164:	1e5a      	subs	r2, r3, #1
  8001166:	617a      	str	r2, [r7, #20]
@@ -1888,7 +1887,7 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
  800116a:	d101      	bne.n	8001170 <I2C_Read+0x6c>
  800116c:	2302      	movs	r3, #2
  800116e:	e048      	b.n	8001202 <I2C_Read+0xfe>
-    while (!LL_I2C_IsActiveFlag_TC(I2C1))
+    while (!LL_I2C_IsActiveFlag_TC(I2C1)) // waiting till transfer complete (TC)
  8001170:	4826      	ldr	r0, [pc, #152]	@ (800120c <I2C_Read+0x108>)
  8001172:	f7ff fe97 	bl	8000ea4 <LL_I2C_IsActiveFlag_TC>
  8001176:	4603      	mov	r3, r0
@@ -1915,10 +1914,10 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
         timeout = I2C_TIMEOUT;
  8001198:	f242 7310 	movw	r3, #10000	@ 0x2710
  800119c:	617b      	str	r3, [r7, #20]
-        while (!LL_I2C_IsActiveFlag_RXNE(I2C1))
+        while (!LL_I2C_IsActiveFlag_RXNE(I2C1)) // wait until receive buffer not empty
  800119e:	e006      	b.n	80011ae <I2C_Read+0xaa>
         {
-            if ((timeout--) == 0) return 3; // Timeout
+            if ((timeout--) == 0) return 3;
  80011a0:	697b      	ldr	r3, [r7, #20]
  80011a2:	1e5a      	subs	r2, r3, #1
  80011a4:	617a      	str	r2, [r7, #20]
@@ -1926,14 +1925,14 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
  80011a8:	d101      	bne.n	80011ae <I2C_Read+0xaa>
  80011aa:	2303      	movs	r3, #3
  80011ac:	e029      	b.n	8001202 <I2C_Read+0xfe>
-        while (!LL_I2C_IsActiveFlag_RXNE(I2C1))
+        while (!LL_I2C_IsActiveFlag_RXNE(I2C1)) // wait until receive buffer not empty
  80011ae:	4817      	ldr	r0, [pc, #92]	@ (800120c <I2C_Read+0x108>)
  80011b0:	f7ff fe52 	bl	8000e58 <LL_I2C_IsActiveFlag_RXNE>
  80011b4:	4603      	mov	r3, r0
  80011b6:	2b00      	cmp	r3, #0
  80011b8:	d0f2      	beq.n	80011a0 <I2C_Read+0x9c>
         }
-        pData[i] = LL_I2C_ReceiveData8(I2C1);
+        pData[i] = LL_I2C_ReceiveData8(I2C1); // storing data
  80011ba:	8a7b      	ldrh	r3, [r7, #18]
  80011bc:	68ba      	ldr	r2, [r7, #8]
  80011be:	18d4      	adds	r4, r2, r3
@@ -1954,10 +1953,10 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
     timeout = I2C_TIMEOUT;
  80011d8:	f242 7310 	movw	r3, #10000	@ 0x2710
  80011dc:	617b      	str	r3, [r7, #20]
-    while (!LL_I2C_IsActiveFlag_STOP(I2C1))
+    while (!LL_I2C_IsActiveFlag_STOP(I2C1)) // wait until stop condition detection
  80011de:	e006      	b.n	80011ee <I2C_Read+0xea>
     {
-        if ((timeout--) == 0) return 4; // Timeout
+        if ((timeout--) == 0) return 4;
  80011e0:	697b      	ldr	r3, [r7, #20]
  80011e2:	1e5a      	subs	r2, r3, #1
  80011e4:	617a      	str	r2, [r7, #20]
@@ -1965,14 +1964,14 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
  80011e8:	d101      	bne.n	80011ee <I2C_Read+0xea>
  80011ea:	2304      	movs	r3, #4
  80011ec:	e009      	b.n	8001202 <I2C_Read+0xfe>
-    while (!LL_I2C_IsActiveFlag_STOP(I2C1))
+    while (!LL_I2C_IsActiveFlag_STOP(I2C1)) // wait until stop condition detection
  80011ee:	4807      	ldr	r0, [pc, #28]	@ (800120c <I2C_Read+0x108>)
  80011f0:	f7ff fe45 	bl	8000e7e <LL_I2C_IsActiveFlag_STOP>
  80011f4:	4603      	mov	r3, r0
  80011f6:	2b00      	cmp	r3, #0
  80011f8:	d0f2      	beq.n	80011e0 <I2C_Read+0xdc>
     }
-    LL_I2C_ClearFlag_STOP(I2C1);
+    LL_I2C_ClearFlag_STOP(I2C1); // resetting flags
  80011fa:	4804      	ldr	r0, [pc, #16]	@ (800120c <I2C_Read+0x108>)
  80011fc:	f7ff fe79 	bl	8000ef2 <LL_I2C_ClearFlag_STOP>
 
@@ -2650,60 +2649,58 @@ int main(void)
  8001614:	e92d 4fb0 	stmdb	sp!, {r4, r5, r7, r8, r9, sl, fp, lr}
  8001618:	b0b0      	sub	sp, #192	@ 0xc0
  800161a:	af06      	add	r7, sp, #24
-	float pressure, altitude, humidity, temperature;
-	char message[150];
-	/* USER CODE BEGIN 1 */
-	LPS25HB_Init();
- 800161c:	f001 fa32 	bl	8002a84 <LPS25HB_Init>
-	HTS221_Init();
- 8001620:	f001 f838 	bl	8002694 <HTS221_Init>
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
 
 	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
- 8001624:	2001      	movs	r0, #1
- 8001626:	f7ff ffbb 	bl	80015a0 <LL_APB2_GRP1_EnableClock>
+ 800161c:	2001      	movs	r0, #1
+ 800161e:	f7ff ffbf 	bl	80015a0 <LL_APB2_GRP1_EnableClock>
 	LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
- 800162a:	f04f 5080 	mov.w	r0, #268435456	@ 0x10000000
- 800162e:	f7ff ff9f 	bl	8001570 <LL_APB1_GRP1_EnableClock>
+ 8001622:	f04f 5080 	mov.w	r0, #268435456	@ 0x10000000
+ 8001626:	f7ff ffa3 	bl	8001570 <LL_APB1_GRP1_EnableClock>
 
 	/* System interrupt init*/
 	NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
- 8001632:	2003      	movs	r0, #3
- 8001634:	f7ff fe5e 	bl	80012f4 <__NVIC_SetPriorityGrouping>
+ 800162a:	2003      	movs	r0, #3
+ 800162c:	f7ff fe62 	bl	80012f4 <__NVIC_SetPriorityGrouping>
 
 	/* SysTick_IRQn interrupt configuration */
 	NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),15, 0));
- 8001638:	f7ff fe80 	bl	800133c <__NVIC_GetPriorityGrouping>
- 800163c:	4603      	mov	r3, r0
- 800163e:	2200      	movs	r2, #0
- 8001640:	210f      	movs	r1, #15
- 8001642:	4618      	mov	r0, r3
- 8001644:	f7ff feb2 	bl	80013ac <NVIC_EncodePriority>
- 8001648:	4603      	mov	r3, r0
- 800164a:	4619      	mov	r1, r3
- 800164c:	f04f 30ff 	mov.w	r0, #4294967295
- 8001650:	f7ff fe82 	bl	8001358 <__NVIC_SetPriority>
+ 8001630:	f7ff fe84 	bl	800133c <__NVIC_GetPriorityGrouping>
+ 8001634:	4603      	mov	r3, r0
+ 8001636:	2200      	movs	r2, #0
+ 8001638:	210f      	movs	r1, #15
+ 800163a:	4618      	mov	r0, r3
+ 800163c:	f7ff feb6 	bl	80013ac <NVIC_EncodePriority>
+ 8001640:	4603      	mov	r3, r0
+ 8001642:	4619      	mov	r1, r3
+ 8001644:	f04f 30ff 	mov.w	r0, #4294967295
+ 8001648:	f7ff fe86 	bl	8001358 <__NVIC_SetPriority>
 	/* USER CODE BEGIN Init */
 
 	/* USER CODE END Init */
 
 	/* Configure the system clock */
 	SystemClock_Config();
- 8001654:	f000 f84c 	bl	80016f0 <SystemClock_Config>
+ 800164c:	f000 f850 	bl	80016f0 <SystemClock_Config>
 	/* USER CODE BEGIN SysInit */
 
 	/* USER CODE END SysInit */
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
- 8001658:	f7ff fb0e 	bl	8000c78 <MX_GPIO_Init>
+ 8001650:	f7ff fb12 	bl	8000c78 <MX_GPIO_Init>
 	MX_I2C1_Init();
- 800165c:	f7ff fddc 	bl	8001218 <MX_I2C1_Init>
+ 8001654:	f7ff fde0 	bl	8001218 <MX_I2C1_Init>
 	MX_USART2_UART_Init();
- 8001660:	f000 fa66 	bl	8001b30 <MX_USART2_UART_Init>
+ 8001658:	f000 fa6a 	bl	8001b30 <MX_USART2_UART_Init>
+	/* USER CODE BEGIN 2 */
+	LPS25HB_Init();
+ 800165c:	f001 fa12 	bl	8002a84 <LPS25HB_Init>
+	HTS221_Init();
+ 8001660:	f001 f818 	bl	8002694 <HTS221_Init>
 	/* Infinite loop */
 
 	while (1)
@@ -2725,7 +2722,7 @@ int main(void)
 		temperature = HTS221_ReadTemperature();
  8001686:	f001 f961 	bl	800294c <HTS221_ReadTemperature>
  800168a:	ed87 0a27 	vstr	s0, [r7, #156]	@ 0x9c
-		sprintf(message, "Pressure: %.2f hPa, Altitude: %.2f m, Humidity: %.2f %%, Temperature: %.2f °C\n",
+		sprintf(message, "Pressure: %.2f hPa, Altitude: %.2f m, Humidity: %.2f %%, Temperature: %.2f °C\r\n",
  800168e:	f8d7 3098 	ldr.w	r3, [r7, #152]	@ 0x98
  8001692:	4618      	mov	r0, r3
  8001694:	f7fe ff58 	bl	8000548 <__aeabi_f2d>
@@ -2757,12 +2754,13 @@ int main(void)
  80016da:	4618      	mov	r0, r3
  80016dc:	f000 f9fe 	bl	8001adc <USART2_SendString>
 
-		LL_mDelay(1000);
- 80016e0:	f44f 707a 	mov.w	r0, #1000	@ 0x3e8
- 80016e4:	f000 ffa0 	bl	8002628 <LL_mDelay>
+		LL_mDelay(200);
+ 80016e0:	20c8      	movs	r0, #200	@ 0xc8
+ 80016e2:	f000 ffa1 	bl	8002628 <LL_mDelay>
 		LPS25HB_ReadPressure(&pressure);
- 80016e8:	bf00      	nop
- 80016ea:	e7bb      	b.n	8001664 <main+0x50>
+ 80016e6:	bf00      	nop
+ 80016e8:	e7bc      	b.n	8001664 <main+0x50>
+ 80016ea:	bf00      	nop
  80016ec:	08006718 	.word	0x08006718
 
 080016f0 <SystemClock_Config>:
@@ -3878,7 +3876,7 @@ LoopForever:
   ldr r1, =_edata
  8001c18:	200001e0 	.word	0x200001e0
   ldr r2, =_sidata
- 8001c1c:	08006b30 	.word	0x08006b30
+ 8001c1c:	08006b38 	.word	0x08006b38
   ldr r2, =_sbss
  8001c20:	200001e0 	.word	0x200001e0
   ldr r4, =_ebss
@@ -5125,7 +5123,7 @@ uint32_t RCC_GetHCLKClockFreq(uint32_t SYSCLK_Frequency)
  800234a:	46bd      	mov	sp, r7
  800234c:	bd80      	pop	{r7, pc}
  800234e:	bf00      	nop
- 8002350:	08006768 	.word	0x08006768
+ 8002350:	0800676c 	.word	0x0800676c
 
 08002354 <RCC_GetPCLK1ClockFreq>:
   * @brief  Return PCLK1 clock frequency
@@ -5154,7 +5152,7 @@ uint32_t RCC_GetPCLK1ClockFreq(uint32_t HCLK_Frequency)
  8002372:	46bd      	mov	sp, r7
  8002374:	bd80      	pop	{r7, pc}
  8002376:	bf00      	nop
- 8002378:	08006778 	.word	0x08006778
+ 8002378:	0800677c 	.word	0x0800677c
 
 0800237c <RCC_GetPCLK2ClockFreq>:
   * @brief  Return PCLK2 clock frequency
@@ -5183,7 +5181,7 @@ uint32_t RCC_GetPCLK2ClockFreq(uint32_t HCLK_Frequency)
  800239a:	46bd      	mov	sp, r7
  800239c:	bd80      	pop	{r7, pc}
  800239e:	bf00      	nop
- 80023a0:	08006778 	.word	0x08006778
+ 80023a0:	0800677c 	.word	0x0800677c
 
 080023a4 <RCC_PLL_GetFreqDomain_SYS>:
 /**
@@ -5803,7 +5801,7 @@ int HTS221_Init(void)
  80026fa:	2b00      	cmp	r3, #0
  80026fc:	d002      	beq.n	8002704 <HTS221_Init+0x70>
     {
-        return -4; // Calibration data read failed
+        return -4;
  80026fe:	f06f 0303 	mvn.w	r3, #3
  8002702:	e075      	b.n	80027f0 <HTS221_Init+0x15c>
     }
@@ -5819,7 +5817,7 @@ int HTS221_Init(void)
  8002712:	2b00      	cmp	r3, #0
  8002714:	d002      	beq.n	800271c <HTS221_Init+0x88>
     {
-        return -5; // Calibration data read failed
+        return -5;
  8002716:	f06f 0304 	mvn.w	r3, #4
  800271a:	e069      	b.n	80027f0 <HTS221_Init+0x15c>
     }
@@ -5844,7 +5842,7 @@ int HTS221_Init(void)
  800273c:	2b00      	cmp	r3, #0
  800273e:	d002      	beq.n	8002746 <HTS221_Init+0xb2>
     {
-        return -6; // Calibration data read failed
+        return -6;
  8002740:	f06f 0305 	mvn.w	r3, #5
  8002744:	e054      	b.n	80027f0 <HTS221_Init+0x15c>
     }
@@ -5870,7 +5868,7 @@ int HTS221_Init(void)
  8002766:	2b00      	cmp	r3, #0
  8002768:	d002      	beq.n	8002770 <HTS221_Init+0xdc>
     {
-        return -7; // Calibration data read failed
+        return -7;
  800276a:	f06f 0306 	mvn.w	r3, #6
  800276e:	e03f      	b.n	80027f0 <HTS221_Init+0x15c>
     }
@@ -5899,6 +5897,7 @@ int HTS221_Init(void)
  800279c:	4b1b      	ldr	r3, [pc, #108]	@ (800280c <HTS221_Init+0x178>)
  800279e:	801a      	strh	r2, [r3, #0]
 
+    // Attempt to read calibration data from registers 0x3C and 0x3E.
     if (I2C_Read(HTS221_I2C_ADDRESS, 0x3C, buffer, 2) != 0 ||
  80027a0:	1d3a      	adds	r2, r7, #4
  80027a2:	2302      	movs	r3, #2
@@ -5919,7 +5918,7 @@ int HTS221_Init(void)
  80027c0:	2b00      	cmp	r3, #0
  80027c2:	d002      	beq.n	80027ca <HTS221_Init+0x136>
     {
-        return -8; // Calibration data read failed
+        return -8;
  80027c4:	f06f 0307 	mvn.w	r3, #7
  80027c8:	e012      	b.n	80027f0 <HTS221_Init+0x15c>
     }
@@ -5944,7 +5943,7 @@ int HTS221_Init(void)
  80027ea:	4b0a      	ldr	r3, [pc, #40]	@ (8002814 <HTS221_Init+0x180>)
  80027ec:	801a      	strh	r2, [r3, #0]
 
-    return 0; // Initialization successful
+    return 0;
  80027ee:	2300      	movs	r3, #0
 }
  80027f0:	4618      	mov	r0, r3
@@ -6244,11 +6243,13 @@ float HTS221_ReadTemperature(void)
 #include "i2c.h"
 #include <math.h>
 
-void LPS25HB_Init(void) {
+void LPS25HB_Init(void)
+{
  8002a84:	b580      	push	{r7, lr}
  8002a86:	b082      	sub	sp, #8
  8002a88:	af00      	add	r7, sp, #0
     uint8_t who_am_i;
+    // initialization check
     if (I2C_Read(LPS25HB_I2C_ADDRESS, LPS25HB_WHO_AM_I, &who_am_i, 1) != 0)
  8002a8a:	1dfa      	adds	r2, r7, #7
  8002a8c:	2301      	movs	r3, #1
@@ -6261,7 +6262,7 @@ void LPS25HB_Init(void) {
     {
         return -1;
     }
-
+     // identity check
     if (who_am_i != EXPECTED_WHO_AM_I_VALUE)
  8002a9c:	79fb      	ldrb	r3, [r7, #7]
  8002a9e:	2bbd      	cmp	r3, #189	@ 0xbd
@@ -6269,9 +6270,9 @@ void LPS25HB_Init(void) {
     {
         return -2;
     }
-
-    uint8_t config = 0x90;
- 8002aa2:	2390      	movs	r3, #144	@ 0x90
+    // sensor config
+    uint8_t config = 0x20;
+ 8002aa2:	2320      	movs	r3, #32
  8002aa4:	71bb      	strb	r3, [r7, #6]
     if (I2C_Write(LPS25HB_I2C_ADDRESS, LPS25HB_CTRL_REG1, &config, 1) != 0)
  8002aa6:	1dba      	adds	r2, r7, #6
@@ -6828,11 +6829,11 @@ float LPS25HB_CalculateAltitude(float pressure)
  8002fb8:	e7ee      	b.n	8002f98 <_printf_float+0x2a4>
  8002fba:	bf00      	nop
  8002fbc:	7fefffff 	.word	0x7fefffff
- 8002fc0:	08006780 	.word	0x08006780
- 8002fc4:	08006784 	.word	0x08006784
- 8002fc8:	08006788 	.word	0x08006788
- 8002fcc:	0800678c 	.word	0x0800678c
- 8002fd0:	08006790 	.word	0x08006790
+ 8002fc0:	08006784 	.word	0x08006784
+ 8002fc4:	08006788 	.word	0x08006788
+ 8002fc8:	0800678c 	.word	0x0800678c
+ 8002fcc:	08006790 	.word	0x08006790
+ 8002fd0:	08006794 	.word	0x08006794
  8002fd4:	6da3      	ldr	r3, [r4, #88]	@ 0x58
  8002fd6:	f8dd a028 	ldr.w	sl, [sp, #40]	@ 0x28
  8002fda:	4553      	cmp	r3, sl
@@ -7312,8 +7313,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  8003454:	f104 0619 	add.w	r6, r4, #25
  8003458:	e7f5      	b.n	8003446 <_printf_i+0x222>
  800345a:	bf00      	nop
- 800345c:	08006792 	.word	0x08006792
- 8003460:	080067a3 	.word	0x080067a3
+ 800345c:	08006796 	.word	0x08006796
+ 8003460:	080067a7 	.word	0x080067a7
 
 08003464 <std>:
  8003464:	2300      	movs	r3, #0
@@ -7683,10 +7684,10 @@ float LPS25HB_CalculateAltitude(float pressure)
  8003792:	4798      	blx	r3
  8003794:	3601      	adds	r6, #1
  8003796:	e7f2      	b.n	800377e <__libc_init_array+0x1e>
- 8003798:	08006b28 	.word	0x08006b28
- 800379c:	08006b28 	.word	0x08006b28
- 80037a0:	08006b28 	.word	0x08006b28
- 80037a4:	08006b2c 	.word	0x08006b2c
+ 8003798:	08006b30 	.word	0x08006b30
+ 800379c:	08006b30 	.word	0x08006b30
+ 80037a0:	08006b30 	.word	0x08006b30
+ 80037a4:	08006b34 	.word	0x08006b34
 
 080037a8 <__retarget_lock_init_recursive>:
  80037a8:	4770      	bx	lr
@@ -8082,15 +8083,15 @@ float LPS25HB_CalculateAltitude(float pressure)
  8003b7c:	3fc68a28 	.word	0x3fc68a28
  8003b80:	509f79fb 	.word	0x509f79fb
  8003b84:	3fd34413 	.word	0x3fd34413
- 8003b88:	080067c1 	.word	0x080067c1
- 8003b8c:	080067d8 	.word	0x080067d8
+ 8003b88:	080067c5 	.word	0x080067c5
+ 8003b8c:	080067dc 	.word	0x080067dc
  8003b90:	7ff00000 	.word	0x7ff00000
- 8003b94:	08006791 	.word	0x08006791
+ 8003b94:	08006795 	.word	0x08006795
  8003b98:	3ff80000 	.word	0x3ff80000
- 8003b9c:	080068d0 	.word	0x080068d0
- 8003ba0:	08006830 	.word	0x08006830
- 8003ba4:	080067bd 	.word	0x080067bd
- 8003ba8:	08006790 	.word	0x08006790
+ 8003b9c:	080068d8 	.word	0x080068d8
+ 8003ba0:	08006834 	.word	0x08006834
+ 8003ba4:	080067c1 	.word	0x080067c1
+ 8003ba8:	08006794 	.word	0x08006794
  8003bac:	f8db 301c 	ldr.w	r3, [fp, #28]
  8003bb0:	6018      	str	r0, [r3, #0]
  8003bb2:	9b07      	ldr	r3, [sp, #28]
@@ -8342,8 +8343,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  8003e72:	f7fc fbc1 	bl	80005f8 <__aeabi_dmul>
  8003e76:	e9cd 0102 	strd	r0, r1, [sp, #8]
  8003e7a:	e7c4      	b.n	8003e06 <_dtoa_r+0x546>
- 8003e7c:	080068d0 	.word	0x080068d0
- 8003e80:	080068a8 	.word	0x080068a8
+ 8003e7c:	080068d8 	.word	0x080068d8
+ 8003e80:	080068b0 	.word	0x080068b0
  8003e84:	3ff00000 	.word	0x3ff00000
  8003e88:	40240000 	.word	0x40240000
  8003e8c:	401c0000 	.word	0x401c0000
@@ -8945,8 +8946,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  8004438:	f000 f968 	bl	800470c <__multadd>
  800443c:	4681      	mov	r9, r0
  800443e:	e7ea      	b.n	8004416 <_dtoa_r+0xb56>
- 8004440:	08006830 	.word	0x08006830
- 8004444:	080067b4 	.word	0x080067b4
+ 8004440:	08006834 	.word	0x08006834
+ 8004444:	080067b8 	.word	0x080067b8
 
 08004448 <_free_r>:
  8004448:	b538      	push	{r3, r4, r5, lr}
@@ -9230,8 +9231,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  80046b8:	e9c0 3303 	strd	r3, r3, [r0, #12]
  80046bc:	e7f7      	b.n	80046ae <_Balloc+0x66>
  80046be:	bf00      	nop
- 80046c0:	080067c1 	.word	0x080067c1
- 80046c4:	08006841 	.word	0x08006841
+ 80046c0:	080067c5 	.word	0x080067c5
+ 80046c4:	08006845 	.word	0x08006845
 
 080046c8 <_Bfree>:
  80046c8:	b570      	push	{r4, r5, r6, lr}
@@ -9259,8 +9260,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  80046fc:	6021      	str	r1, [r4, #0]
  80046fe:	f843 4022 	str.w	r4, [r3, r2, lsl #2]
  8004702:	bd70      	pop	{r4, r5, r6, pc}
- 8004704:	080067c1 	.word	0x080067c1
- 8004708:	08006841 	.word	0x08006841
+ 8004704:	080067c5 	.word	0x080067c5
+ 8004708:	08006845 	.word	0x08006845
 
 0800470c <__multadd>:
  800470c:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
@@ -9314,8 +9315,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  8004788:	6125      	str	r5, [r4, #16]
  800478a:	4620      	mov	r0, r4
  800478c:	e8bd 81f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, pc}
- 8004790:	08006830 	.word	0x08006830
- 8004794:	08006841 	.word	0x08006841
+ 8004790:	08006834 	.word	0x08006834
+ 8004794:	08006845 	.word	0x08006845
 
 08004798 <__hi0bits>:
  8004798:	f5b0 3f80 	cmp.w	r0, #65536	@ 0x10000
@@ -9405,8 +9406,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  800484e:	6103      	str	r3, [r0, #16]
  8004850:	bd10      	pop	{r4, pc}
  8004852:	bf00      	nop
- 8004854:	08006830 	.word	0x08006830
- 8004858:	08006841 	.word	0x08006841
+ 8004854:	08006834 	.word	0x08006834
+ 8004858:	08006845 	.word	0x08006845
 
 0800485c <__multiply>:
  800485c:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -9525,8 +9526,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  80049a2:	e799      	b.n	80048d8 <__multiply+0x7c>
  80049a4:	3e01      	subs	r6, #1
  80049a6:	e79b      	b.n	80048e0 <__multiply+0x84>
- 80049a8:	08006830 	.word	0x08006830
- 80049ac:	08006841 	.word	0x08006841
+ 80049a8:	08006834 	.word	0x08006834
+ 80049ac:	08006845 	.word	0x08006845
 
 080049b0 <__pow5mult>:
  80049b0:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -9594,9 +9595,9 @@ float LPS25HB_CalculateAltitude(float pressure)
  8004a50:	4630      	mov	r0, r6
  8004a52:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
  8004a56:	bf00      	nop
- 8004a58:	0800689c 	.word	0x0800689c
- 8004a5c:	080067c1 	.word	0x080067c1
- 8004a60:	08006841 	.word	0x08006841
+ 8004a58:	080068a0 	.word	0x080068a0
+ 8004a5c:	080067c5 	.word	0x080067c5
+ 8004a60:	08006845 	.word	0x08006845
 
 08004a64 <__lshift>:
  8004a64:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -9675,8 +9676,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  8004b2e:	d8f9      	bhi.n	8004b24 <__lshift+0xc0>
  8004b30:	e7ea      	b.n	8004b08 <__lshift+0xa4>
  8004b32:	bf00      	nop
- 8004b34:	08006830 	.word	0x08006830
- 8004b38:	08006841 	.word	0x08006841
+ 8004b34:	08006834 	.word	0x08006834
+ 8004b38:	08006845 	.word	0x08006845
 
 08004b3c <__mcmp>:
  8004b3c:	690a      	ldr	r2, [r1, #16]
@@ -9812,8 +9813,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  8004c8e:	3f01      	subs	r7, #1
  8004c90:	e7e7      	b.n	8004c62 <__mdiff+0xee>
  8004c92:	bf00      	nop
- 8004c94:	08006830 	.word	0x08006830
- 8004c98:	08006841 	.word	0x08006841
+ 8004c94:	08006834 	.word	0x08006834
+ 8004c98:	08006845 	.word	0x08006845
 
 08004c9c <__d2b>:
  8004c9c:	e92d 43f7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
@@ -9879,8 +9880,8 @@ float LPS25HB_CalculateAltitude(float pressure)
  8004d3a:	f7ff fd2d 	bl	8004798 <__hi0bits>
  8004d3e:	ebc0 1042 	rsb	r0, r0, r2, lsl #5
  8004d42:	e7e5      	b.n	8004d10 <__d2b+0x74>
- 8004d44:	08006830 	.word	0x08006830
- 8004d48:	08006841 	.word	0x08006841
+ 8004d44:	08006834 	.word	0x08006834
+ 8004d48:	08006845 	.word	0x08006845
 
 08004d4c <__ssputs_r>:
  8004d4c:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -10157,11 +10158,11 @@ float LPS25HB_CalculateAltitude(float pressure)
  8004fe0:	4638      	mov	r0, r7
  8004fe2:	f7fe f91f 	bl	8003224 <_printf_i>
  8004fe6:	e7ed      	b.n	8004fc4 <_svfiprintf_r+0x1c0>
- 8004fe8:	08006998 	.word	0x08006998
- 8004fec:	080069a2 	.word	0x080069a2
+ 8004fe8:	080069a0 	.word	0x080069a0
+ 8004fec:	080069aa 	.word	0x080069aa
  8004ff0:	08002cf5 	.word	0x08002cf5
  8004ff4:	08004d4d 	.word	0x08004d4d
- 8004ff8:	0800699e 	.word	0x0800699e
+ 8004ff8:	080069a6 	.word	0x080069a6
 
 08004ffc <__sflush_r>:
  8004ffc:	f9b1 200c 	ldrsh.w	r2, [r1, #12]
@@ -10393,9 +10394,9 @@ float LPS25HB_CalculateAltitude(float pressure)
  80051ec:	e7f4      	b.n	80051d8 <__assert_func+0x14>
  80051ee:	bf00      	nop
  80051f0:	20000010 	.word	0x20000010
- 80051f4:	080069ee 	.word	0x080069ee
- 80051f8:	080069c0 	.word	0x080069c0
- 80051fc:	080069b3 	.word	0x080069b3
+ 80051f4:	080069f6 	.word	0x080069f6
+ 80051f8:	080069c8 	.word	0x080069c8
+ 80051fc:	080069bb 	.word	0x080069bb
 
 08005200 <_calloc_r>:
  8005200:	b570      	push	{r4, r5, r6, lr}
@@ -10783,11 +10784,11 @@ float LPS25HB_CalculateAltitude(float pressure)
  800556c:	4630      	mov	r0, r6
  800556e:	f7fd fe59 	bl	8003224 <_printf_i>
  8005572:	e7e4      	b.n	800553e <_vfiprintf_r+0x1e6>
- 8005574:	08006998 	.word	0x08006998
- 8005578:	080069a2 	.word	0x080069a2
+ 8005574:	080069a0 	.word	0x080069a0
+ 8005578:	080069aa 	.word	0x080069aa
  800557c:	08002cf5 	.word	0x08002cf5
  8005580:	08005335 	.word	0x08005335
- 8005584:	0800699e 	.word	0x0800699e
+ 8005584:	080069a6 	.word	0x080069a6
 
 08005588 <__swbuf_r>:
  8005588:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
@@ -11883,11 +11884,11 @@ float LPS25HB_CalculateAltitude(float pressure)
  80060b4:	43400000 	.word	0x43400000
  80060b8:	0003988e 	.word	0x0003988e
  80060bc:	000bb679 	.word	0x000bb679
- 80060c0:	08006b10 	.word	0x08006b10
+ 80060c0:	08006b18 	.word	0x08006b18
  80060c4:	3ff00000 	.word	0x3ff00000
  80060c8:	40080000 	.word	0x40080000
- 80060cc:	08006af0 	.word	0x08006af0
- 80060d0:	08006b00 	.word	0x08006b00
+ 80060cc:	08006af8 	.word	0x08006af8
+ 80060d0:	08006b08 	.word	0x08006b08
  80060d4:	460b      	mov	r3, r1
  80060d6:	e9dd 0106 	ldrd	r0, r1, [sp, #24]
  80060da:	e5d7      	b.n	8005c8c <__ieee754_pow+0x354>

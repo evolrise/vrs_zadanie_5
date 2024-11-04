@@ -2,19 +2,21 @@
 #include "i2c.h"
 #include <math.h>
 
-void LPS25HB_Init(void) {
+void LPS25HB_Init(void)
+{
     uint8_t who_am_i;
+    // initialization check
     if (I2C_Read(LPS25HB_I2C_ADDRESS, LPS25HB_WHO_AM_I, &who_am_i, 1) != 0)
     {
         return -1;
     }
-
+     // identity check
     if (who_am_i != EXPECTED_WHO_AM_I_VALUE)
     {
         return -2;
     }
-
-    uint8_t config = 0x90;
+    // sensor config
+    uint8_t config = 0x20;
     if (I2C_Write(LPS25HB_I2C_ADDRESS, LPS25HB_CTRL_REG1, &config, 1) != 0)
     {
         return -3;

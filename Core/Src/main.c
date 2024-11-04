@@ -24,7 +24,6 @@
 #include "lps25hb.h"
 #include "hts221.h"
 #include <stdio.h>
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -71,8 +70,6 @@ int main(void)
 	float pressure, altitude, humidity, temperature;
 	char message[150];
 	/* USER CODE BEGIN 1 */
-	LPS25HB_Init();
-	HTS221_Init();
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -103,7 +100,8 @@ int main(void)
 	MX_I2C1_Init();
 	MX_USART2_UART_Init();
 	/* USER CODE BEGIN 2 */
-
+	LPS25HB_Init();
+	HTS221_Init();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -116,11 +114,11 @@ int main(void)
 
 		humidity = HTS221_ReadHumidity();
 		temperature = HTS221_ReadTemperature();
-		sprintf(message, "Pressure: %.2f hPa, Altitude: %.2f m, Humidity: %.2f %%, Temperature: %.2f °C\n",
+		sprintf(message, "Pressure: %.2f hPa, Altitude: %.2f m, Humidity: %.2f %%, Temperature: %.2f °C\r\n",
 				pressure, altitude, humidity, temperature);
 		USART2_SendString(message);
 
-		LL_mDelay(1000);
+		LL_mDelay(200);
 		/* USER CODE END WHILE */
 	}
 

@@ -31,39 +31,40 @@ int HTS221_Init(void)
     if (I2C_Read(HTS221_I2C_ADDRESS, 0x30, &H0_rH_x2, 1) != 0 ||
         I2C_Read(HTS221_I2C_ADDRESS, 0x31, &H1_rH_x2, 1) != 0)
     {
-        return -4; // Calibration data read failed
+        return -4;
     }
 
     uint8_t buffer[2];
     if (I2C_Read(HTS221_I2C_ADDRESS, 0x36, buffer, 2) != 0)
     {
-        return -5; // Calibration data read failed
+        return -5;
     }
     H0_T0_OUT = (int16_t)(buffer[1] << 8 | buffer[0]);
 
     if (I2C_Read(HTS221_I2C_ADDRESS, 0x3A, buffer, 2) != 0)
     {
-        return -6; // Calibration data read failed
+        return -6;
     }
     H1_T0_OUT = (int16_t)(buffer[1] << 8 | buffer[0]);
 
     // Read calibration data for temperature
     if (I2C_Read(HTS221_I2C_ADDRESS, 0x32, buffer, 2) != 0)
     {
-        return -7; // Calibration data read failed
+        return -7;
     }
     T0_degC_x8 = buffer[0] | ((buffer[1] & 0x03) << 8);
     T1_degC_x8 = buffer[1] | ((buffer[1] & 0x0C) << 6);
 
+    // Attempt to read calibration data from registers 0x3C and 0x3E.
     if (I2C_Read(HTS221_I2C_ADDRESS, 0x3C, buffer, 2) != 0 ||
         I2C_Read(HTS221_I2C_ADDRESS, 0x3E, buffer, 2) != 0)
     {
-        return -8; // Calibration data read failed
+        return -8;
     }
     T0_OUT = (int16_t)(buffer[1] << 8 | buffer[0]);
     T1_OUT = (int16_t)(buffer[1] << 8 | buffer[0]);
 
-    return 0; // Initialization successful
+    return 0;
 }
 
 float HTS221_ReadHumidity(void)

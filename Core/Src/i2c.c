@@ -62,7 +62,7 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
 {
     uint32_t timeout = I2C_TIMEOUT;
 
-    while (LL_I2C_IsActiveFlag_BUSY(I2C1))
+    while (LL_I2C_IsActiveFlag_BUSY(I2C1)) // checking if bus is busy
     {
         if ((timeout--) == 0) return 1;
     }
@@ -71,9 +71,9 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
     LL_I2C_TransmitData8(I2C1, Reg);
 
     timeout = I2C_TIMEOUT;
-    while (!LL_I2C_IsActiveFlag_TC(I2C1))
+    while (!LL_I2C_IsActiveFlag_TC(I2C1)) // waiting till transfer complete (TC)
     {
-        if ((timeout--) == 0) return 2; // Timeout
+        if ((timeout--) == 0) return 2;
     }
 
     LL_I2C_HandleTransfer(I2C1, DevAddress, LL_I2C_ADDRSLAVE_7BIT, Size, LL_I2C_MODE_AUTOEND, LL_I2C_GENERATE_START_READ);
@@ -81,19 +81,19 @@ uint8_t I2C_Read(uint16_t DevAddress, uint8_t Reg, uint8_t *pData, uint16_t Size
     for (uint16_t i = 0; i < Size; i++)
     {
         timeout = I2C_TIMEOUT;
-        while (!LL_I2C_IsActiveFlag_RXNE(I2C1))
+        while (!LL_I2C_IsActiveFlag_RXNE(I2C1)) // wait until receive buffer not empty
         {
-            if ((timeout--) == 0) return 3; // Timeout
+            if ((timeout--) == 0) return 3;
         }
-        pData[i] = LL_I2C_ReceiveData8(I2C1);
+        pData[i] = LL_I2C_ReceiveData8(I2C1); // storing data
     }
 
     timeout = I2C_TIMEOUT;
-    while (!LL_I2C_IsActiveFlag_STOP(I2C1))
+    while (!LL_I2C_IsActiveFlag_STOP(I2C1)) // wait until stop condition detection
     {
-        if ((timeout--) == 0) return 4; // Timeout
+        if ((timeout--) == 0) return 4;
     }
-    LL_I2C_ClearFlag_STOP(I2C1);
+    LL_I2C_ClearFlag_STOP(I2C1); // resetting flags
 
     return 0;
 }

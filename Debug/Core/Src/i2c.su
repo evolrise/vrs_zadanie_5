@@ -19,5 +19,5 @@
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_bus.h:285:22:LL_AHB1_GRP1_EnableClock	24	static
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_ll_bus.h:535:22:LL_APB1_GRP1_EnableClock	24	static
 ../Core/Src/i2c.c:29:9:I2C_Write	40	static
-../Core/Src/i2c.c:62:9:I2C_Read	48	static
-../Core/Src/i2c.c:104:6:MX_I2C1_Init	64	static
+../Core/Src/i2c.c:61:9:I2C_Read	48	static
+../Core/Src/i2c.c:103:6:MX_I2C1_Init	64	static
